@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Одиниці довжини, маси і вартості — тренажер</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ok:#2e9d4f;--okbg:#e2f6e7;--okink:#1b6a33;
+  --bad:#d63b3b;--badbg:#fde5e5;--badink:#9e1f1f;
+  --sel:#2f6fd6;--selbg:#e4edfc;
+  --ink:#2a2a38;--muted:#6b6880;--red:#c9303a;--paper:#fff;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;background:#f7f2e8;color:var(--ink);font-size:18px;line-height:1.4}
+.wrap{max-width:980px;margin:0 auto;padding:0 14px}
+button{font-family:inherit}
+
+/* header */
+.top{background:linear-gradient(180deg,#fbe7b0,#f9dc93);padding:18px 0 14px;border-bottom:3px solid #f0c867}
+.top .wrap{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.top svg.deco{width:118px;height:70px;flex:none}
+.top .tt{flex:1;min-width:240px}
+.lesson{display:inline-block;background:#fff;border-radius:999px;padding:2px 12px;font-weight:800;color:var(--red);font-size:14px;letter-spacing:.3px}
+h1{margin:6px 0 4px;font-size:clamp(24px,4.4vw,34px);line-height:1.15;color:var(--red);font-weight:900}
+.sub{margin:0;color:#5b4a1e;font-size:16px}
+.top .actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* sticky bar */
+.bar{position:sticky;top:0;z-index:20;background:rgba(255,253,247,.96);backdrop-filter:blur(6px);border-bottom:1px solid #e9dfc9;box-shadow:0 2px 8px rgba(80,60,20,.06)}
+.bar-in{display:flex;align-items:center;gap:12px;padding:8px 14px;flex-wrap:wrap}
+.score{font-weight:800;white-space:nowrap}
+.score b{color:var(--ok);font-size:20px}
+.prog{flex:1;min-width:120px;height:12px;background:#ece5d5;border-radius:99px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#57c27a,#2e9d4f);border-radius:99px;transition:width .4s}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chip{width:30px;height:30px;border-radius:50%;border:2px solid #d8cfbb;background:#fff;font-weight:800;font-size:14px;color:var(--muted);cursor:pointer;padding:0}
+.chip.full{background:var(--ok);border-color:var(--ok);color:#fff}
+.chip.mid{background:#f2b632;border-color:#e0a21c;color:#fff}
+.chip.low{background:var(--bad);border-color:var(--bad);color:#fff}
+
+/* buttons */
+.btn{border:0;border-radius:14px;padding:10px 18px;font-size:17px;font-weight:800;cursor:pointer;background:var(--red);color:#fff;box-shadow:0 3px 0 #8f1f26;transition:transform .08s}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #8f1f26}
+.btn:disabled{background:#b9b3a6;box-shadow:0 3px 0 #8d887d;cursor:default}
+.btn.ghost{background:#fff;color:var(--red);box-shadow:0 3px 0 #e2b65a}
+.btn.green{background:var(--ok);box-shadow:0 3px 0 #1d6b35}
+.btn.big{font-size:20px;padding:14px 26px}
+
+/* cheat sheet */
+details.cheat{background:#fff;border:2px dashed #e3c77d;border-radius:16px;margin:18px 0 0;padding:4px 16px}
+details.cheat summary{cursor:pointer;font-weight:800;color:#8a6510;padding:8px 0}
+.cheat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;padding:4px 0 12px}
+.cheat-grid div{background:#fdf7e6;border-radius:12px;padding:8px 12px}
+.cheat-grid b{color:var(--red)}
+.cheat p{margin:0 0 12px;color:#5b4a1e}
+
+/* cards */
+.card{background:var(--theme);border-radius:24px;padding:14px 14px 16px;margin:20px 0;scroll-margin-top:70px}
+.head{display:flex;align-items:baseline;gap:8px}
+.num{font-size:26px;font-weight:900;color:var(--red)}
+.card h2{margin:0;font-size:22px;font-weight:800}
+.pts{display:inline-block;margin:6px 0 2px;background:rgba(255,255,255,.7);padding:2px 12px;border-radius:99px;font-size:14px;font-weight:700;color:#5d5770}
+.task{margin:8px 2px 10px;font-size:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.box{background:var(--paper);border-radius:18px;padding:10px 14px}
+.box.wide{grid-column:1/-1}
+.box-t{font-size:14px;font-weight:800;color:var(--muted);margin-bottom:2px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 7px;padding:7px 0;font-size:20px;border-bottom:1px dashed #ece8f2}
+.row:last-child{border-bottom:0}
+.tx{white-space:pre-wrap}
+.prob{margin:2px 0 6px;font-size:18px}
+.q{font-size:18px}
+i.v{font-family:Georgia,'Times New Roman',serif;font-size:1.1em}
+
+/* inputs */
+input.num{width:6.6em;font:inherit;font-size:20px;font-weight:700;padding:4px 6px;border:2px solid #bdb7cf;border-radius:10px;text-align:center;background:#fbfaff;color:var(--ink)}
+input.num.short{width:4.2em}
+input.num:focus{outline:none;border-color:var(--sel);background:#fff;box-shadow:0 0 0 3px #cfe0ff}
+select.unit{font:inherit;font-size:19px;font-weight:700;padding:3px 6px;border:2px solid #bdb7cf;border-radius:10px;background:#fbfaff;color:var(--ink);min-width:3.6em}
+select:disabled{opacity:1}
+.ok{border-color:var(--ok)!important;background:var(--okbg)!important;color:var(--okink)!important}
+.bad{border-color:var(--bad)!important;background:var(--badbg)!important;color:var(--badink)!important}
+.ans{display:inline-block;background:#fff;border:2px dashed var(--ok);color:var(--okink);border-radius:9px;padding:0 8px;font-size:16px;font-weight:800}
+
+/* choice buttons */
+.choices{display:inline-flex;gap:6px;flex-wrap:wrap}
+.ch{min-width:44px;height:44px;padding:0 12px;border:2px solid #bdb7cf;border-radius:12px;background:#fff;font-size:20px;font-weight:800;color:var(--ink);cursor:pointer}
+.ch.sel{border-color:var(--sel);background:var(--selbg);color:var(--sel)}
+.choices.locked .ch{cursor:default}
+.ch.right{outline:3px dashed var(--ok);outline-offset:2px}
+.choices.empty .ch{border-color:#eaa7a7;background:#fff6f6}
+.signs .ch{width:44px;padding:0;border-radius:50%}
+.tf .ch{width:48px}
+.expr .ch{font-size:19px;font-weight:700;height:auto;min-height:44px;padding:6px 14px}
+.who .ch{font-size:17px}
+.tfrow{justify-content:space-between}
+
+/* hundreds chips */
+.nums{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:6px 0}
+.nch{font-size:22px;font-weight:800;padding:8px 18px;border-radius:14px;border:2px solid #bdb7cf;background:#fff;cursor:pointer;color:var(--ink)}
+.nch.sel{border-color:var(--sel);background:var(--selbg);color:var(--sel)}
+
+/* footer of card */
+.foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
+.res{font-weight:700;font-size:17px}
+.res.good{color:var(--okink)} .res.mid{color:#9a6a00} .res.low{color:var(--badink)} .res.warn{color:#9a6a00}
+details.hint{margin-top:10px;background:rgba(255,255,255,.55);border-radius:12px;padding:2px 12px}
+details.hint summary{cursor:pointer;font-weight:800;color:#7a5d00;padding:6px 0}
+details.hint div{padding:0 0 8px;font-size:17px}
+
+/* finish + summary */
+.finish{text-align:center;margin:26px 0 10px}
+#summary{background:#fff;border-radius:26px;padding:22px 18px;margin:16px 0 50px;box-shadow:0 6px 24px rgba(80,60,20,.12);text-align:center;border:3px solid #f0c867;scroll-margin-top:70px}
+#summary h2{margin:0;color:var(--red);font-size:28px}
+.stars{display:flex;justify-content:center;gap:8px;margin:12px 0 4px}
+.stars svg{width:54px;height:54px}
+.big-score{font-size:40px;font-weight:900;margin:4px 0}
+.big-score small{font-size:20px;color:var(--muted);font-weight:700}
+.msg{font-size:19px;margin:6px 0 14px}
+table.sum{width:100%;max-width:620px;margin:0 auto 16px;border-collapse:collapse;text-align:left;font-size:16px}
+table.sum td{padding:7px 8px;border-bottom:1px solid #eee}
+table.sum td:last-child{text-align:right;font-weight:800;white-space:nowrap}
+td.full{color:var(--okink)} td.mid{color:#9a6a00} td.low{color:var(--badink)}
+.sum-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.note{font-size:15px;color:var(--muted);margin-top:10px}
+footer{text-align:center;color:var(--muted);font-size:14px;padding:0 0 30px}
+@media (max-width:520px){
+  body{font-size:17px}
+  .row{font-size:19px}
+  input.num{width:5.8em;font-size:19px}
+  .card{padding:12px 10px 14px;border-radius:20px}
+  .box{padding:8px 10px}
+  .top svg.deco{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <svg class="deco" viewBox="0 0 118 70" aria-hidden="true">
+      <rect x="2" y="40" width="70" height="20" rx="4" fill="#fff" stroke="#c9303a" stroke-width="2"/>
+      <g stroke="#c9303a" stroke-width="2">
+        <line x1="10" y1="40" x2="10" y2="52"/><line x1="18" y1="40" x2="18" y2="47"/><line x1="26" y1="40" x2="26" y2="52"/>
+        <line x1="34" y1="40" x2="34" y2="47"/><line x1="42" y1="40" x2="42" y2="52"/><line x1="50" y1="40" x2="50" y2="47"/>
+        <line x1="58" y1="40" x2="58" y2="52"/><line x1="66" y1="40" x2="66" y2="47"/>
+      </g>
+      <path d="M22 34 L30 12 H46 L54 34 Z" fill="#6b6880"/>
+      <circle cx="38" cy="10" r="6" fill="none" stroke="#6b6880" stroke-width="3"/>
+      <text x="38" y="30" font-size="11" font-weight="800" fill="#fff" text-anchor="middle" font-family="Nunito,sans-serif">кг</text>
+      <circle cx="94" cy="44" r="20" fill="#f2b632" stroke="#b9800b" stroke-width="2"/>
+      <circle cx="94" cy="44" r="15" fill="none" stroke="#b9800b" stroke-width="1.5" stroke-dasharray="2 2"/>
+      <text x="94" y="49" font-size="13" font-weight="900" fill="#7a5200" text-anchor="middle" font-family="Nunito,sans-serif">грн</text>
+    </svg>
+    <div class="tt">
+      <span class="lesson">Математична гра · Повторення за 3 клас</span>
+      <h1>Одиниці довжини, маси і вартості</h1>
+      <p class="sub">Виконуй завдання, натискай «Перевірити» й збирай очки. Щоразу числа нові!</p>
+    </div>
+    <div class="actions"><button type="button" class="btn ghost" id="newBtn">Нові числа</button></div>
+  </div>
+</header>
+
+<div class="bar">
+  <div class="wrap bar-in">
+    <div class="score">Очки: <b id="sc">0</b> / <span id="mx">0</span></div>
+    <div class="prog"><i id="pg"></i></div>
+    <div class="chips" id="chips"></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <details class="cheat">
+    <summary>Шпаргалка: таблиця одиниць (відкрий, якщо потрібно)</summary>
+    <div class="cheat-grid">
+      <div><b>Довжина</b><br>1 км = 1&nbsp;000 м<br>1 м = 10 дм = 100 см = 1&nbsp;000 мм<br>1 дм = 10 см = 100 мм<br>1 см = 10 мм</div>
+      <div><b>Маса</b><br>1 т = 10 ц = 1&nbsp;000 кг<br>1 ц = 100 кг<br>1 кг = 1&nbsp;000 г</div>
+      <div><b>Вартість</b><br>1 грн = 100 коп.</div>
+    </div>
+    <p>Більші одиниці → менші: <b>множимо</b>. Менші одиниці → більші: <b>ділимо</b>.</p>
+  </details>
+
+  <div id="secs"></div>
+
+  <div class="finish"><button type="button" class="btn big green" id="finBtn">Завершити й побачити підсумок</button></div>
+  <div id="summary" hidden></div>
+</main>
+<footer>Завдання складено за мотивами уроку 36 «Одиниці довжини, маси і вартості. Повторення за 3 клас».</footer>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- helpers ---------- */
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const NB=' ';
+function fmt(n){const s=String(n);return n>=1000?s.replace(/\B(?=(\d{3})+(?!\d))/g,NB):s;}
+function parseNum(s){s=String(s).replace(/[\s.,']/g,'');return /^\d+$/.test(s)?parseInt(s,10):null;}
+function plural(n,f){const a=n%10,b=n%100;if(a===1&&b!==11)return f[0];if(a>=2&&a<=4&&(b<12||b>14))return f[1];return f[2];}
+const PTS=['очко','очки','очок'];
+function h(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
+function t(s){const e=h('span','tx');e.textContent=s;return e;}
+function row(){const r=h('div','row');for(const p of arguments)r.append(typeof p==='string'?t(p):p);return r;}
+function box(title,cls){const b=h('div','box'+(cls?' '+cls:''));if(title)b.append(h('div','box-t',title));return b;}
+function numIn(ans,cls){const i=h('input','num'+(cls?' '+cls:''));i.type='text';i.inputMode='numeric';i.autocomplete='off';i.setAttribute('autocorrect','off');i.spellcheck=false;i.dataset.ans=ans;return i;}
+function lockMark(e,ok){e.classList.add(ok?'ok':'bad');if(e.tagName==='INPUT')e.readOnly=true;else e.disabled=true;}
+function addAns(after,text){if(after._ans)return;const s=h('span','ans');s.textContent='→ '+text;after.insertAdjacentElement('afterend',s);after._ans=s;}
+const razy=k=>k>=5?'разів':'рази';
+
+/* ---------- units ---------- */
+const REL=[['км','м',1000],['м','дм',10],['м','см',100],['м','мм',1000],['дм','см',10],['дм','мм',100],['см','мм',10],
+           ['т','ц',10],['т','кг',1000],['ц','кг',100],['кг','г',1000],['грн','коп.',100]];
+const UNITS=['кг','т','км','м','г','см','дм','ц','мм','грн','коп.'];
+function factor(a,b){const r=REL.find(x=>x[0]===a&&x[1]===b);return r?r[2]:null;}
+function smallPart(f){const r=Math.random();if(f===10||r<0.35)return R(1,Math.min(9,f-1));if(f>=1000&&r<0.6)return R(10,99);return R(10,f-1);}
+function niceN(lo,hi){if(Math.random()<0.3){const a=Math.ceil(lo/10),b=Math.floor(hi/10);if(b>=a)return R(a,b)*10;}return R(lo,hi);}
+
+/* ---------- item types ---------- */
+function inItem(inputs,pts){return{pts,
+  filled:()=>inputs.every(i=>i.value.trim()!==''),
+  grade(){let all=true;inputs.forEach(i=>{const ok=parseNum(i.value)===+i.dataset.ans;lockMark(i,ok);if(!ok)all=false;});return all?pts:0;},
+  reveal(){inputs.forEach(i=>{if(i.classList.contains('bad'))addAns(i,fmt(+i.dataset.ans));});}};}
+function unitSel(){const s=h('select','unit');s.innerHTML='<option value="">…</option>'+UNITS.map(u=>'<option value="'+u+'">'+u+'</option>').join('');return s;}
+function selItem(s,okFn,ansText){return{pts:1,
+  filled:()=>s.value!=='',
+  grade(){const ok=okFn();lockMark(s,ok);return ok?1:0;},
+  reveal(){if(s.classList.contains('bad'))addAns(s,ansText);}};}
+function choices(opts,cls){const w=h('div','choices'+(cls?' '+cls:''));const g={el:w,value:null,locked:false,btns:[]};
+  opts.forEach(o=>{const b=h('button','ch',o.html!=null?o.html:null);if(o.html==null)b.textContent=o.label;b.type='button';b._v=o.value;
+    b.onclick=()=>{if(g.locked)return;g.value=o.value;g.btns.forEach(x=>x.classList.toggle('sel',x===b));};g.btns.push(b);w.append(b);});
+  return g;}
+function chItem(g,correct,pts){pts=pts||1;return{pts,
+  filled:()=>g.value!==null,
+  grade(){g.locked=true;g.el.classList.add('locked');const ok=g.value===correct;
+    g.btns.forEach(b=>{if(b._v===g.value)b.classList.add(ok?'ok':'bad');});if(g.value===null)g.el.classList.add('empty');return ok?pts:0;},
+  reveal(){if(g.value!==correct)g.btns.forEach(b=>{if(b._v===correct)b.classList.add('right');});}};}
+const SIGN_OPTS=[{label:'<',value:'<'},{label:'=',value:'='},{label:'>',value:'>'}];
+const signOf=(a,b)=>a<b?'<':a>b?'>':'=';
+
+/* ---------- 1. Добери одиниці ---------- */
+function gen1(){
+  const items=[],body=h('div','grid');
+  const pool=shuffle(REL.filter(r=>r[2]>=100));
+  const bA=box(),bB=box(),bC=box('Рівності не повинні повторюватися');
+  pool.slice(0,3).forEach(([b,s,f])=>{const sel=unitSel();bA.append(row('1 '+b+' = '+fmt(f),sel));items.push(selItem(sel,()=>factor(b,sel.value)===f,s));});
+  pool.slice(3,6).forEach(([b,s,f])=>{const sel=unitSel();bB.append(row('1',sel,'= '+fmt(f)+' '+s));items.push(selItem(sel,()=>factor(sel.value,s)===f,b));});
+  const rows=[];for(let k=0;k<3;k++){const a=unitSel(),c=unitSel();bC.append(row('1',a,'= 10',c));rows.push([a,c]);}
+  const TEN=REL.filter(r=>r[2]===10);
+  items.push({pts:3,used:new Set(),
+    filled:()=>rows.every(([a,c])=>a.value&&c.value),
+    grade(){let p=0;this.used=new Set();rows.forEach(([a,c])=>{const key=a.value+'|'+c.value;const ok=factor(a.value,c.value)===10&&!this.used.has(key);if(ok){this.used.add(key);p++;}lockMark(a,ok);lockMark(c,ok);});return p;},
+    reveal(){const free=TEN.filter(r=>!this.used.has(r[0]+'|'+r[1]));let k=0;rows.forEach(([a,c])=>{if(a.classList.contains('bad')&&free[k]){addAns(c,'1 '+free[k][0]+' = 10 '+free[k][1]);k++;}});}});
+  body.append(bA,bB,bC);
+  return{title:'Добери одиниці вимірювання',theme:'#e6e3f3',ptsNote:'1 очко за кожну рівність',
+    task:'Обери одиниці так, щоб рівності були правильними.',body,items,
+    hint:'Пригадай таблицю: 1 м = 100 см, 1 ц = 100 кг, 1 т = 1&nbsp;000 кг, 1 км = 1&nbsp;000 м… У третьому стовпчику підходять кілька пар — головне, щоб вони не повторювалися.'};
+}
+
+/* ---------- 2. Більші → менші ---------- */
+const CONV=[['км','м',2,99],['см','мм',11,99],['т','кг',2,999],['кг','г',2,999],['м','см',2,99],['м','мм',2,99],
+            ['грн','коп.',2,999],['ц','кг',2,999],['м','дм',2,999],['дм','мм',2,99],['т','ц',2,999],['дм','см',2,999]];
+function gen2(){
+  const items=[],body=h('div','grid');const b1=box(),b2=box();
+  shuffle(CONV).slice(0,6).forEach(([B,S,lo,hi],k)=>{const n=niceN(lo,hi);const inp=numIn(n*factor(B,S));(k<3?b1:b2).append(row(fmt(n)+' '+B+' =',inp,S));items.push(inItem([inp],1));});
+  const b3=box('Ланцюжки — по 2 очки','wide');
+  [pick([['т','ц','кг'],['ц','кг','г']]),pick([['м','дм','см','мм'],['км','м','дм','см']])].forEach(ch=>{
+    const n=R(2,ch[0]==='км'?40:99);let v=n;const parts=[n+' '+ch[0]+' ='];const ins=[];
+    for(let k=1;k<ch.length;k++){v*=factor(ch[k-1],ch[k]);const i=numIn(v);ins.push(i);parts.push(i,ch[k]+(k<ch.length-1?' =':''));}
+    b3.append(row.apply(null,parts));items.push(inItem(ins,2));});
+  body.append(b1,b2,b3);
+  return{title:'Перетвори більші одиниці в менші',theme:'#f4e0e8',ptsNote:'1 очко за кожну рівність, ланцюжок — 2 очки',
+    task:'Запиши число в менших одиницях.',body,items,
+    hint:'Щоб перейти до менших одиниць, множ: 7 м = 7 · 100 см = 700 см. У ланцюжку кожен наступний крок роби з попереднього числа.'};
+}
+
+/* ---------- 3. Дві одиниці ---------- */
+const FWD=[['м','см'],['грн','коп.'],['т','кг'],['км','м'],['кг','г'],['ц','кг'],['дм','см'],['т','ц']];
+const REV=[['м','см'],['грн','коп.'],['т','кг'],['км','м'],['кг','г'],['см','мм'],['ц','кг']];
+function gen3(){
+  const items=[],body=h('div','grid');const b1=box('Вирази в менших одиницях'),b2=box('Вирази в більших і менших одиницях');
+  shuffle(FWD).slice(0,3).forEach(([B,S])=>{const f=factor(B,S),a=R(2,f>=1000?30:60),b=smallPart(f);const inp=numIn(a*f+b);
+    b1.append(row(a+' '+B+' '+b+' '+S+' =',inp,S));items.push(inItem([inp],1));});
+  shuffle(REV).slice(0,3).forEach(([B,S])=>{const f=factor(B,S),a=R(2,f>=1000?30:60),b=smallPart(f);const i1=numIn(a,'short'),i2=numIn(b,'short');
+    b2.append(row(fmt(a*f+b)+' '+S+' =',i1,B,i2,S));items.push(inItem([i1,i2],1));});
+  body.append(b1,b2);
+  return{title:'Величини з двома одиницями',theme:'#dfeaf5',ptsNote:'1 очко за кожну рівність',
+    task:'Вирази величину в менших одиницях або, навпаки, розклади на більші й менші одиниці.',body,items,
+    hint:'3 м 5 см = 300 см + 5 см = <b>305</b> см (не загуби нуль!).<br>2&nbsp;045 кг = <b>2</b> т <b>45</b> кг, бо 1 т = 1&nbsp;000 кг.'};
+}
+
+/* ---------- 4. Істинні / хибні ---------- */
+function tfPair(){
+  const [B,S,f]=pick(REL);const A=R(2,Math.min(99,Math.floor(99000/f)));const step=f>=100?f/10:1;const base=A*f;let v;const k=R(0,4);
+  if(k===0)v=base;else if(k===1)v=base+step*R(1,9);else if(k===2)v=base-step*R(1,9);else if(k===3)v=f>=100?base/10:A;else v=base*10<=99999?base*10:base+step*R(1,9);
+  return[[A,B,base],[v,S,v]];
+}
+function gen4(){
+  let list,tr;
+  do{list=[];const seen=new Set();while(list.length<8){let [x,y]=tfPair();if(Math.random()<.5)[x,y]=[y,x];const sg=pick(['<','>']);
+      const txt=fmt(x[0])+' '+x[1]+' '+sg+' '+fmt(y[0])+' '+y[1];if(seen.has(txt))continue;seen.add(txt);
+      list.push({txt,truth:sg==='<'?x[2]<y[2]:x[2]>y[2]});}
+    tr=list.filter(o=>o.truth).length;}while(tr<3||tr>5);
+  const items=[],body=h('div','grid');const b1=box(),b2=box();
+  list.forEach((o,k)=>{const g=choices([{label:'І',value:true},{label:'Х',value:false}],'tf');const r=row(o.txt,g.el);r.classList.add('tfrow');(k<4?b1:b2).append(r);items.push(chItem(g,o.truth));});
+  body.append(b1,b2);
+  return{title:'Істинні чи хибні нерівності',theme:'#fbe4d8',ptsNote:'1 очко за кожну нерівність',
+    task:'Прочитай нерівності. Познач істинні — І, хибні — Х.',body,items,
+    hint:'Спочатку вирази обидві величини в однакових одиницях, потім порівнюй. Наприклад, 5 т = 5&nbsp;000 кг, а 5&nbsp;000 кг &gt; 4&nbsp;800 кг. Якщо величини рівні, то нерівність зі знаком &lt; або &gt; — хибна.'};
+}
+
+/* ---------- 5. Порівняй величини ---------- */
+function cmpQty(){
+  const [B,S,f]=pick(REL);const step=f>=100?f/10:1;let L,Lv,Rt,Rv;
+  if(Math.random()<0.6){const a=R(1,f>=1000?20:40),b=smallPart(f);Lv=a*f+b;L=a+' '+B+' '+b+' '+S;
+    Rv=pick([Lv,Lv,+(String(a)+String(b)),Lv+step*R(1,5),Lv-step*R(1,5)].filter(x=>x>0));Rt=fmt(Rv)+' '+S;}
+  else{const A=R(2,f>=1000?60:99);Lv=A*f;L=fmt(A)+' '+B;Rv=pick([Lv,Lv,f>=100?Lv/10:A,Lv+step*R(1,9),Lv-step*R(1,9)]);Rt=fmt(Rv)+' '+S;}
+  return Math.random()<.5?{L,R:Rt,sign:signOf(Lv,Rv)}:{L:Rt,R:L,sign:signOf(Rv,Lv)};
+}
+function gen5(){
+  let list;
+  do{list=[];const seen=new Set();while(list.length<6){const o=cmpQty();if(seen.has(o.L+o.R))continue;seen.add(o.L+o.R);list.push(o);}}
+  while(new Set(list.map(o=>o.sign)).size<3);
+  const items=[],body=h('div','grid');const b1=box(),b2=box();
+  list.forEach((o,k)=>{const g=choices(SIGN_OPTS,'signs');(k<3?b1:b2).append(row(o.L,g.el,o.R));items.push(chItem(g,o.sign));});
+  body.append(b1,b2);
+  return{title:'Порівняй величини',theme:'#e2efdc',ptsNote:'1 очко за кожну пару',
+    task:'Постав знак <, > або =.',body,items,
+    hint:'Переведи обидві величини в менші одиниці: 4 м 5 см = 405 см. Будь уважним: 4 м 5 см — це не 45 см!'};
+}
+
+/* ---------- 6. Обери вираз до задачі ---------- */
+const CTX=[
+  {s:'З екскурсійного автобуса вийшло <i class="v">a</i> туристів, щоб пообідати.',rem:'залишилося в автобусі',q:'Скільки всього туристів було в автобусі?'},
+  {s:'З вагона потяга на станції вийшло <i class="v">a</i> пасажирів.',rem:'залишилося у вагоні',q:'Скільки всього пасажирів було у вагоні?'},
+  {s:'З класу на перерву вийшло <i class="v">a</i> учнів.',rem:'залишилося в класі',q:'Скільки всього учнів було в класі?'},
+  {s:'Із ящика взяли <i class="v">a</i> кг яблук.',rem:'залишилося в ящику',q:'Скільки кілограмів яблук було в ящику спочатку?'},
+  {s:'З басейну на берег вийшло <i class="v">a</i> дітей.',rem:'залишилося в басейні',q:'Скільки всього дітей було в басейні?'},
+  {s:'З бідона відлили <i class="v">a</i> л молока.',rem:'залишилося в бідоні',q:'Скільки літрів молока було в бідоні спочатку?'}
+];
+const EXPR_POOL=['a·k','a:k','a:k + k','a·k + k','a + a·k','a + a:k','a + (a − k)','a + (a + k)','a − k','a + k','a·k − a'];
+function exprHtml(s,k){return s.replace(/k/g,k).replace(/a/g,'<i class="v">a</i>');}
+function gen6(){
+  const RELS=[
+    k=>({t:'у '+k+' '+razy(k)+' більше',ans:'a + a:k'}),
+    k=>({t:'у '+k+' '+razy(k)+' менше',ans:'a + a·k'}),
+    k=>({t:'на '+k+' більше',ans:'a + (a − k)'}),
+    k=>({t:'на '+k+' менше',ans:'a + (a + k)'})];
+  const rIdx=shuffle([0,1,2,3]).slice(0,2),ctx=shuffle(CTX).slice(0,2);
+  const items=[],body=h('div','grid');
+  rIdx.forEach((ri,n)=>{const k=ri<2?R(2,5):R(3,12);const rel=RELS[ri](k);const c=ctx[n];
+    const opts=shuffle([rel.ans].concat(shuffle(EXPR_POOL.filter(e=>e!==rel.ans)).slice(0,4)));
+    const b=box('Задача '+(n+1),'wide');
+    b.append(h('p','prob',c.s+' Це '+rel.t+', ніж '+c.rem+'. '+c.q));
+    const g=choices(opts.map(o=>({html:exprHtml(o,k),value:o})),'expr');b.append(g.el);
+    items.push(chItem(g,rel.ans,3));body.append(b);});
+  return{title:'Обери вираз до задачі',theme:'#fde9cf',ptsNote:'3 очки за кожну задачу',
+    task:'Прочитай задачу й обери вираз, яким вона розв’язується.',body,items,
+    hint:'Спочатку з’ясуй, скільки залишилося. «Вийшло у 3 рази більше, ніж залишилося» означає, що залишилося у 3 рази менше: <i class="v">a</i> : 3. Потім додай тих, хто вийшов.'};
+}
+
+/* ---------- 7. Задачі ---------- */
+const GOODS=[['зошит','зошити','зошитів'],['олівець','олівці','олівців'],['блокнот','блокноти','блокнотів'],['фломастер','фломастери','фломастерів']];
+function gen7(){
+  const items=[],body=h('div','grid');
+  // 7.1 trucks
+  {const n=R(2,5),p=R(8,20),tt=R(2,9);let m;do{m=R(2,9);}while(m===tt);const V=p*n*tt;
+   const b=box('Задача 1','wide');
+   b.append(h('p','prob',n+' '+(n<5?'однакові вантажівки':'однакових вантажівок')+' з насінням соняшника за '+tt+' год дороги разом витратили '+fmt(V)+' л пального. Скільки пального витратить кожна вантажівка за '+m+' год дороги?'));
+   const i1=numIn(n*p),i2=numIn(p),i3=numIn(p*m);
+   b.append(row('1) Усі вантажівки разом за 1 год:',i1,'л'),row('2) Одна вантажівка за 1 год:',i2,'л'),row('3) Одна вантажівка за '+m+' год:',i3,'л'));
+   [i1,i2,i3].forEach(i=>items.push(inItem([i],1)));body.append(b);}
+  // 7.2 greenhouses
+  {let pA,pB,nA,nB,tA,tB;pA=R(25,90);pB=R(10,pA-5);nA=R(2,6);nB=R(2,6);tA=R(2,5);tB=R(2,5);
+   const b=box('Задача 2','wide');
+   b.append(h('p','prob','Фермер А для поливання рослин у '+nA+' теплицях за '+tA+' год використав '+fmt(pA*nA*tA)+' л води, а фермер Б — у '+nB+' теплицях за '+tB+' год використав '+fmt(pB*nB*tB)+' л води. На скільки більше літрів води для поливання рослин в одній теплиці за 1 год використовував фермер А, ніж фермер Б?'));
+   const i1=numIn(pA),i2=numIn(pB),i3=numIn(pA-pB);
+   b.append(row('1) Фермер А: одна теплиця за 1 год —',i1,'л'),row('2) Фермер Б: одна теплиця за 1 год —',i2,'л'),row('3) Відповідь: на',i3,'л більше'));
+   [i1,i2,i3].forEach(i=>items.push(inItem([i],1)));body.append(b);}
+  // 7.3 money
+  {const gd=pick(GOODS);const b=box('Задача 3','wide');let T,txt;
+   do{const a=R(3,25),c=pick([10,20,25,30,40,45,50,60,70,75,80,90]),n=R(2,6);const cost=(a*100+c)*n;
+     if(Math.random()<.5){T=cost;txt=gd[0][0].toUpperCase()+gd[0].slice(1)+' коштує '+a+' грн '+c+' коп. Скільки коштують '+n+' '+plural(n,gd)+'?';}
+     else{const M=(Math.floor(cost/1000)+1)*10+pick([0,10,40]);T=M*100-cost;txt='Даринка мала '+M+' грн. Вона купила '+n+' '+plural(n,gd)+' по '+a+' грн '+c+' коп. Скільки решти отримала Даринка?';}
+   }while(T%100===0||T<=0);
+   b.append(h('p','prob',txt));
+   const i1=numIn(Math.floor(T/100),'short'),i2=numIn(T%100,'short');
+   b.append(row('Відповідь:',i1,'грн',i2,'коп.'));
+   items.push(inItem([i1],1),inItem([i2],1));body.append(b);}
+  return{title:'Розв’яжи задачі',theme:'#dcecd2',ptsNote:'1 очко за кожну правильну відповідь',
+    task:'Розв’язуй задачі по діях і записуй відповіді у віконця.',body,items,
+    hint:'Задача 1: спочатку дізнайся, скільки пального витратили всі вантажівки за 1 год (ділимо на кількість годин), потім — одна вантажівка (ділимо на кількість вантажівок).<br>Задача 3: переведи гривні в копійки, обчисли, а потім знову розклади на грн і коп.'};
+}
+
+/* ---------- 8. Однакове число сотень ---------- */
+function gen8(){
+  let H;do{H=R(123,987);}while(new Set(String(H)).size<3||String(H).includes('0'));
+  const corr=[],used=new Set();while(corr.length<3){const n=H*100+R(0,99);if(!used.has(n)){used.add(n);corr.push(n);}}
+  const d=String(H).split('');
+  const cand=[[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]].map(p=>+(p.map(i=>d[i]).join(''))*100+R(0,99));
+  cand.push((H%100)*100+R(0,99),H*1000+R(0,999),H*10+R(0,9));
+  const hs=new Set([H]),dis=[];
+  for(const c of shuffle(cand)){const hh=Math.floor(c/100);if(!hs.has(hh)&&!used.has(c)){hs.add(hh);dis.push(c);}if(dis.length===4)break;}
+  const all=shuffle(corr.concat(dis));const isC=new Set(corr);
+  const wrap=h('div','nums');const btns=all.map(n=>{const b=h('button','nch');b.type='button';b.textContent=fmt(n);b._n=n;b.onclick=()=>{if(wrap._locked)return;b.classList.toggle('sel');};wrap.append(b);return b;});
+  const b=box(null,'wide');b.append(wrap);const body=h('div','grid');body.append(b);
+  const items=[{pts:2,
+    filled:()=>btns.some(x=>x.classList.contains('sel')),
+    grade(){wrap._locked=true;let err=0;btns.forEach(x=>{const s=x.classList.contains('sel'),c=isC.has(x._n);if(s){x.classList.add(c?'ok':'bad');x.classList.remove('sel');}if(s!==c)err++;});return err===0?2:err===1?1:0;},
+    reveal(){btns.forEach(x=>{if(isC.has(x._n)&&!x.classList.contains('ok'))x.classList.add('ch','right');});}}];
+  return{title:'Однакове число сотень',theme:'#e6e6e6',ptsNote:'2 очки (1 помилка — 1 очко)',
+    task:'Познач усі числа, які містять однакове число всіх сотень.',body,items,
+    hint:'Щоб знайти число всіх сотень, закрий дві останні цифри: у числі 12&nbsp;903 всього <b>129</b> сотень, а в числі 2&nbsp;903 — лише <b>29</b>.'};
+}
+
+/* ---------- 9. Значення виразів ---------- */
+function exprPair(type){
+  const delta=()=>pick([0,0,R(1,9),-R(1,9),10,-10,100,-100]);
+  if(type===0){const q=R(3,9),s=R(60,150),r=pick([500,1000,2000]);const Lv=s+r;const Rv=Lv+delta();return{L:fmt(q*s)+' : '+q+' + '+fmt(r),Lv,Rt:fmt(Rv),Rv};}
+  if(type===1){const k=R(3,9),q=R(3,9),s=R(30,120);const Lv=k*s;const Rv=Lv+delta();const Z=R(1000,3000);return{L:k+' · ('+fmt(q*s)+' : '+q+')',Lv,Rt:fmt(Rv+Z)+' − '+fmt(Z),Rv};}
+  if(type===2){const b=R(110,400),c=R(2,9),Rr=R(10,50)*100+pick([0,0,R(1,99)]);const A=b*c+Rr;const Rv=Rr+pick([0,0,100,-100,R(1,9),-R(1,9)]);return{L:fmt(A)+' − '+b+' · '+c,Lv:Rr,Rt:fmt(Rv),Rv};}
+  const a=R(10,90),b=R(2,9),c=R(100,300);const Lv=a+b*c;const Rv=Lv+delta();const E=pick([10,100]);return{L:a+' + '+b+' · '+c,Lv,Rt:fmt(Rv*E)+' : '+E,Rv};
+}
+function gen9(){
+  let list;do{list=shuffle([0,1,2,3]).slice(0,3).map(exprPair);}while(new Set(list.map(o=>signOf(o.Lv,o.Rv))).size<2);
+  const items=[],b=box(null,'wide'),body=h('div','grid');
+  list.forEach(o=>{const g=choices(SIGN_OPTS,'signs');b.append(row(o.L,g.el,o.Rt));items.push(chItem(g,signOf(o.Lv,o.Rv)));});
+  body.append(b);
+  return{title:'Порівняй значення виразів',theme:'#dde8f5',ptsNote:'1 очко за кожну пару',
+    task:'Обчисли значення виразів і постав знак <, > або =. Пам’ятай про порядок дій!',body,items,
+    hint:'Спочатку виконуй дії в дужках, потім множення й ділення, а вже потім додавання й віднімання.'};
+}
+
+/* ---------- 10. Лисиця і вовк ---------- */
+function gen10(){
+  const S=pick([10,12,14,16,18,20]);const k=S/2;const wolf=k*k,fox=k*(k+1);
+  const b=box(null,'wide'),body=h('div','grid');
+  b.append(h('p','prob','Лисиця ділила рибу: одну — вовкові, дві — собі, три — вовкові, чотири — собі, … . Лисиця припинила поділ, коли поклала собі '+S+' рибин.'));
+  const i1=numIn(wolf),i2=numIn(fox),i4=numIn(k);
+  const g=choices([{label:'Вовк',value:'w'},{label:'Лисиця',value:'f'},{label:'Порівну',value:'='}],'who');
+  b.append(row('1) Скільки всього рибин отримав вовк?',i1),row('2) Скільки всього рибин отримала лисиця?',i2),row('3) Хто отримав більше?',g.el),row('4) На скільки більше?',i4));
+  body.append(b);
+  return{title:'Задача на кмітливість',theme:'#fff1c4',ptsNote:'1 очко за кожну відповідь',task:null,body,
+    items:[inItem([i1],1),inItem([i2],1),chItem(g,'f'),inItem([i4],1)],
+    hint:'Запиши, скільки рибин отримував кожен: вовк — 1, 3, 5, …; лисиця — 2, 4, 6, … . У кожній парі лисиця отримувала на 1 рибину більше. Скільки було таких пар?'};
+}
+
+/* ---------- app ---------- */
+const GENS=[gen1,gen2,gen3,gen4,gen5,gen6,gen7,gen8,gen9,gen10];
+const secsEl=document.getElementById('secs'),chipsEl=document.getElementById('chips'),sumEl=document.getElementById('summary');
+let SECS=[],revealed=false;
+
+function renderSec(s){
+  const c=h('section','card');c.style.setProperty('--theme',s.theme);c.id='s'+s.idx;
+  const head=h('div','head');head.append(h('span','num',s.idx+'.'));const h2=h('h2');h2.textContent=s.title;head.append(h2);c.append(head);
+  c.append(h('div','pts',s.ptsNote));
+  if(s.task){const p=h('p','task');p.textContent=s.task;c.append(p);}
+  c.append(s.body);
+  if(s.hint){const d=h('details','hint');d.innerHTML='<summary>Підказка</summary><div>'+s.hint+'</div>';c.append(d);}
+  const foot=h('div','foot'),btn=h('button','btn','Перевірити'),res=h('div','res');btn.type='button';foot.append(btn,res);c.append(foot);
+  s.el=c;s.btn=btn;s.res=res;s.warned=false;
+  btn.onclick=()=>{if(s.checked)return;
+    if(!s.warned&&!s.items.every(i=>i.filled())){s.warned=true;res.className='res warn';res.textContent='Ще не всі відповіді заповнені. Натисни ще раз, щоб перевірити все одно.';btn.textContent='Перевірити все одно';return;}
+    checkSec(s);};
+  return c;
+}
+function resText(s){return 'Набрано '+s.score+' '+plural(s.score,PTS)+' з '+s.max;}
+function cls(s){const p=s.score/s.max;return p===1?'full':p>=0.5?'mid':'low';}
+function checkSec(s){
+  s.score=s.items.reduce((a,i)=>a+i.grade(),0);s.checked=true;s.btn.disabled=true;s.btn.textContent='Перевірено';
+  const c=cls(s);s.res.className='res '+(c==='full'?'good':c);s.res.textContent=resText(s)+(c==='full'?' — молодець!':'');
+  updBar();
+}
+function updBar(){
+  const max=SECS.reduce((a,s)=>a+s.max,0),sc=SECS.reduce((a,s)=>a+(s.checked?s.score:0),0);
+  document.getElementById('sc').textContent=sc;document.getElementById('mx').textContent=max;
+  document.getElementById('pg').style.width=(max?sc/max*100:0)+'%';
+  SECS.forEach(s=>{s.chip.className='chip'+(s.checked?' '+cls(s):'');});
+}
+function build(){
+  secsEl.innerHTML='';chipsEl.innerHTML='';sumEl.hidden=true;sumEl.innerHTML='';revealed=false;
+  SECS=GENS.map((g,i)=>{const s=g();s.idx=i+1;s.max=s.items.reduce((a,it)=>a+it.pts,0);s.checked=false;s.score=0;
+    secsEl.append(renderSec(s));
+    const ch=h('button','chip');ch.type='button';ch.textContent=s.idx;ch.title=s.title;ch.onclick=()=>s.el.scrollIntoView({behavior:'smooth'});chipsEl.append(ch);s.chip=ch;
+    return s;});
+  updBar();
+}
+const STAR='<svg viewBox="0 0 24 24"><path fill="FILL" stroke="#c9900e" stroke-width="1" d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>';
+function finish(){
+  SECS.forEach(s=>{if(!s.checked)checkSec(s);});
+  const max=SECS.reduce((a,s)=>a+s.max,0),sc=SECS.reduce((a,s)=>a+s.score,0),p=Math.round(sc/max*100);
+  const st=p>=90?3:p>=70?2:p>=40?1:0;
+  const msg=p>=90?'Чудово! Ти справжній знавець одиниць вимірювання!':p>=70?'Добре! Ще трохи тренування — і буде ідеально.':p>=40?'Непогано, але варто ще раз повторити таблицю одиниць.':'Зазирни в шпаргалку й спробуй ще раз — у тебе все вийде!';
+  let stars='';for(let i=0;i<3;i++)stars+=STAR.replace('FILL',i<st?'#f6c02c':'#ebe6da');
+  let rows='';SECS.forEach(s=>{rows+='<tr><td>'+s.idx+'. '+s.title+'</td><td class="'+cls(s)+'">'+s.score+' / '+s.max+'</td></tr>';});
+  sumEl.innerHTML='<h2>Підсумок</h2><div class="stars">'+stars+'</div>'+
+    '<div class="big-score">'+sc+' <small>'+plural(sc,PTS)+' з '+max+' ('+p+'%)</small></div>'+
+    '<p class="msg">'+msg+'</p><table class="sum">'+rows+'</table>'+
+    '<div class="sum-actions"><button type="button" class="btn ghost" id="revBtn">Показати правильні відповіді</button><button type="button" class="btn green" id="againBtn">Пройти ще раз з новими числами</button></div>'+
+    '<p class="note">Правильні відповіді з’являться поруч із червоними віконцями в рамці з пунктиром.</p>';
+  sumEl.hidden=false;
+  document.getElementById('revBtn').onclick=function(){if(revealed)return;revealed=true;SECS.forEach(s=>s.items.forEach(i=>i.reveal&&i.reveal()));this.disabled=true;this.textContent='Відповіді показано';};
+  document.getElementById('againBtn').onclick=()=>{build();window.scrollTo({top:0,behavior:'smooth'});};
+  sumEl.scrollIntoView({behavior:'smooth'});
+}
+document.getElementById('finBtn').onclick=finish;
+
+const newBtn=document.getElementById('newBtn');let confirmT=null;
+newBtn.onclick=()=>{
+  const started=SECS.some(s=>s.checked)||[...document.querySelectorAll('input.num')].some(i=>i.value.trim()!=='');
+  if(started&&!confirmT){newBtn.textContent='Точно? Натисни ще раз';confirmT=setTimeout(()=>{newBtn.textContent='Нові числа';confirmT=null;},3000);return;}
+  clearTimeout(confirmT);confirmT=null;newBtn.textContent='Нові числа';build();window.scrollTo({top:0,behavior:'smooth'});
+};
+
+document.addEventListener('input',e=>{if(e.target.matches('input.num')){const v=e.target.value.replace(/[^\d\s]/g,'');if(v!==e.target.value)e.target.value=v;}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('input.num')){e.preventDefault();
+  const all=[...document.querySelectorAll('input.num:not([readonly])')];const i=all.indexOf(e.target);if(all[i+1])all[i+1].focus();else e.target.blur();}});
+
+build();
+window.__test={SECS:()=>SECS,finish,build};
+})();
+</script>
+</body>
+</html>
